@@ -22,6 +22,7 @@ export interface ISettings {
       esy: string;
       ocamlfind: string;
       ocamlmerlin: string;
+      ocamlmerlinArgs: string[];
       ocpindent: string;
       opam: string;
       rebuild: string;
@@ -60,6 +61,7 @@ export namespace ISettings {
         esy: "esy",
         ocamlfind: "ocamlfind",
         ocamlmerlin: "ocamlmerlin",
+        ocamlmerlinArgs: [],
         ocpindent: "ocp-indent",
         opam: "opam",
         rebuild: "rebuild",

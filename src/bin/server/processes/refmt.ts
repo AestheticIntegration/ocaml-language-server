@@ -11,7 +11,8 @@ export default class ReFMT {
     const width = session.settings.reason.format.width;
     const widthArg = width === null ? [] : ["--print-width", `${width}`];
 
+    const [cmd, cmdArgs] = session.makeOpamCmd(command);
     const args = argsOpt || ["--parse", "re", "--print", "re", "--interface", `${/\.rei$/.test(uri)}`].concat(widthArg);
-    this.process = session.environment.spawn(command, args);
+    this.process = session.environment.spawn(cmd, cmdArgs.concat(args));
   }
 }

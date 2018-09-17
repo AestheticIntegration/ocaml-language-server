@@ -19,6 +19,7 @@ export default class Session implements LSP.Disposable {
   };
   public readonly connection: server.IConnection = server.createConnection();
   public readonly environment: Environment;
+  public hasOpam: string | undefined;
   public readonly indexer: Indexer;
   public readonly initConf: LSP.InitializeParams;
   public readonly merlin: Merlin;
@@ -66,6 +67,18 @@ export default class Session implements LSP.Disposable {
 
   public log(data: any): void {
     this.connection.console.log(JSON.stringify(data, null, 2));
+  }
+
+  public makeOpamCmd(cmd: string): [string, string[]] {
+    if (this.hasOpam) {
+      if (this.hasOpam === "1") {
+        return [this.settings.reason.path.opam, ["env", "exec", "--", cmd]];
+      } else {
+        return [this.settings.reason.path.opam, ["exec", "--", cmd]];
+      }
+    } else {
+      return [cmd, []];
+    }
   }
 
   public async onDidChangeConfiguration({ settings }: LSP.DidChangeConfigurationParams): Promise<void> {

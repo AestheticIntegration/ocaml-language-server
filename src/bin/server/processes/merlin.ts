@@ -23,7 +23,13 @@ export default class Merlin implements LSP.Disposable {
     const cwd = this.session.initConf.rootUri || this.session.initConf.rootPath;
     const options = cwd ? { cwd: URI.parse(cwd).fsPath } : {};
 
-    (this.process as any) = this.session.environment.spawn(ocamlmerlin, [], options);
+    const [cmd, args] = this.session.makeOpamCmd(ocamlmerlin);
+
+    (this.process as any) = this.session.environment.spawn(
+      cmd,
+      args.concat(this.session.settings.reason.path.ocamlmerlinArgs),
+      options,
+    );
 
     // this.process.on("exit", (code, signal) => {
     //   this.session.connection.console.log(JSON.stringify({ code, signal }));

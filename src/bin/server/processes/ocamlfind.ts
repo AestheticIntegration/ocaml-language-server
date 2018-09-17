@@ -6,6 +6,7 @@ export default class Ocamlfind {
   constructor(session: Session, argsOpt?: string[]) {
     const command = session.settings.reason.path.ocamlfind;
     const args = argsOpt || ["list"];
-    this.process = session.environment.spawn(command, args);
+    const [cmd, cmdArgs] = session.makeOpamCmd(command);
+    this.process = session.environment.spawn(cmd, cmdArgs.concat(args));
   }
 }
