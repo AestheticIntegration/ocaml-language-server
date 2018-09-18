@@ -34,16 +34,28 @@ export default class Merlin implements LSP.Disposable {
     // this.process.on("exit", (code, signal) => {
     //   this.session.connection.console.log(JSON.stringify({ code, signal }));
     // });
-    this.process.on("error", (error: Error & { code: string }) => {
-      // this.session.connection.console.log(JSON.stringify({ error }));
-      if ("ENOENT" === error.code) {
-        this.session.connection.window.showWarningMessage(`Cannot find merlin binary at "${ocamlmerlin}".`);
-        this.session.connection.window.showWarningMessage(
-          `Double check your path or try configuring "reason.path.ocamlmerlin" under "User Settings".`,
-        );
-      }
-      throw error;
-    });
+    if (this.session.hasOpam) {
+      this.process.on("exit", code => {
+        if (code !== 0) {
+          this.session.connection.window.showWarningMessage(`Cannot find merlin binary at "${ocamlmerlin}".`);
+          this.session.connection.window.showWarningMessage(
+            `Double check your path or try configuring "reason.path.ocamlmerlin" under "User Settings".`,
+          );
+        }
+        throw new Error(`binary at ${this.session.settings.reason.path.ocamlmerlin} not found.`);
+      });
+    } else {
+      this.process.on("error", (error: Error & { code: string }) => {
+        // this.session.connection.console.log(JSON.stringify({ error }));
+        if ("ENOENT" === error.code) {
+          this.session.connection.window.showWarningMessage(`Cannot find merlin binary at "${ocamlmerlin}".`);
+          this.session.connection.window.showWarningMessage(
+            `Double check your path or try configuring "reason.path.ocamlmerlin" under "User Settings".`,
+          );
+        }
+        throw error;
+      });
+    }
     this.process.stderr.on("data", (data: string) => {
       this.session.connection.window.showErrorMessage(`ocamlmerlin error: ${data}`);
     });

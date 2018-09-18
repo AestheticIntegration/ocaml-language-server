@@ -7,6 +7,15 @@ export default class OcpIndent {
     const command = session.settings.reason.path.ocpindent;
     const [cmd, cmdArgs] = session.makeOpamCmd(command);
     this.process = session.environment.spawn(cmd, cmdArgs.concat(args));
-    this.process.on("error", error => session.error(`Error formatting file: ${error}`));
+
+    if (session.hasOpam) {
+      this.process.on("exit", code => {
+        if (code !== 0) {
+          session.error(`Opam error formatting file with code: ${code}`);
+        }
+      });
+    } else {
+      this.process.on("error", error => session.error(`Error formatting file: ${error}`));
+    }
   }
 }
